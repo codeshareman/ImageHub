@@ -1,0 +1,7 @@
+MRZZZ photo asset license
+
+Unless a specific asset file states otherwise, all photo and image assets under mrzzz/photos/inbox/ and mrzzz/photos/objects/ are All Rights Reserved.
+
+No permission is granted to copy, redistribute, modify, train on, or commercially reuse these assets outside the rights separately granted by the copyright holder.
+
+Repository code, validation scripts, and manifest/schema scaffolding remain governed by the repository root LICENSE unless a file states otherwise.

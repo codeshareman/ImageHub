@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://assets.mrzzz.top/photos.manifest.schema.json",
+  "title": "MRZZZ Photos Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assetProvider",
+    "featuredCollections",
+    "albums",
+    "photos"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "assetProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "repo",
+        "branch",
+        "manifestPath",
+        "assetPathPrefix",
+        "ingressPathPrefix"
+      ],
+      "properties": {
+        "type": { "const": "github-repo" },
+        "repo": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+        "branch": { "type": "string", "minLength": 1 },
+        "manifestPath": { "type": "string", "const": "mrzzz/photos/manifests/photos.manifest.json" },
+        "assetPathPrefix": { "type": "string", "const": "mrzzz/photos/objects/" },
+        "ingressPathPrefix": { "type": "string", "const": "mrzzz/photos/inbox/" }
+      }
+    },
+    "featuredCollections": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string", "minLength": 1 },
+        "uniqueItems": true
+      }
+    },
+    "albums": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "order", "coverPhotoId"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string" },
+          "order": { "type": "integer", "minimum": 0 },
+          "coverPhotoId": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "takenAt", "albumIds", "variants"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "caption": { "type": "string" },
+          "takenAt": { "type": "string", "format": "date-time" },
+          "albumIds": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "variants": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["assetPath", "sha256", "mediaType", "width", "height"],
+              "properties": {
+                "assetPath": {
+                  "type": "string",
+                  "pattern": "^mrzzz/photos/objects/sha256/[0-9a-f]{2}/[0-9a-f]{64}\\.jpe?g$"
+                },
+                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "mediaType": {
+                  "type": "string",
+                  "enum": ["image/jpeg"]
+                },
+                "width": { "type": "integer", "minimum": 1 },
+                "height": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

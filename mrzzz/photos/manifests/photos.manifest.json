@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "assetProvider": {
+    "type": "github-repo",
+    "repo": "codeshareman/ImageHub",
+    "branch": "main",
+    "manifestPath": "mrzzz/photos/manifests/photos.manifest.json",
+    "assetPathPrefix": "mrzzz/photos/objects/",
+    "ingressPathPrefix": "mrzzz/photos/inbox/"
+  },
+  "featuredCollections": {
+    "home-quad": [
+      "photo-001",
+      "photo-002",
+      "photo-003",
+      "photo-004"
+    ]
+  },
+  "albums": [
+    {
+      "id": "default-album",
+      "title": "Default Album",
+      "summary": "Initial gallery migrated from ImageHub photography assets.",
+      "order": 10,
+      "coverPhotoId": "photo-001"
+    }
+  ],
+  "photos": [
+    {
+      "id": "photo-001",
+      "title": "Morning Landscape",
+      "caption": "Migrated from the existing ImageHub photography collection.",
+      "takenAt": "2026-02-21T09:34:03Z",
+      "albumIds": [
+        "default-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/bd/bdf4856cb8c3868aad01653656dbc26ea4b8ee0839857f37acb5c29ced3dddfc.jpg",
+          "sha256": "bdf4856cb8c3868aad01653656dbc26ea4b8ee0839857f37acb5c29ced3dddfc",
+          "mediaType": "image/jpeg",
+          "width": 842,
+          "height": 1722
+        }
+      }
+    },
+    {
+      "id": "photo-002",
+      "title": "Quiet Ridge",
+      "caption": "Migrated from the existing ImageHub photography collection.",
+      "takenAt": "2026-02-21T09:30:12Z",
+      "albumIds": [
+        "default-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/c9/c9e3439973b989ed1987e55eb12c46690cd54b0466ed344e78eea84743dd1151.jpg",
+          "sha256": "c9e3439973b989ed1987e55eb12c46690cd54b0466ed344e78eea84743dd1151",
+          "mediaType": "image/jpeg",
+          "width": 760,
+          "height": 1322
+        }
+      }
+    },
+    {
+      "id": "photo-003",
+      "title": "Low Clouds",
+      "caption": "Migrated from the existing ImageHub photography collection.",
+      "takenAt": "2026-02-21T09:30:54Z",
+      "albumIds": [
+        "default-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/48/483ad57140ab36d26add7e3892f875c4cba378f91f705e902aa1781affc18844.jpg",
+          "sha256": "483ad57140ab36d26add7e3892f875c4cba378f91f705e902aa1781affc18844",
+          "mediaType": "image/jpeg",
+          "width": 718,
+          "height": 324
+        }
+      }
+    },
+    {
+      "id": "photo-004",
+      "title": "Wide Valley",
+      "caption": "Migrated from the existing ImageHub photography collection.",
+      "takenAt": "2026-02-19T16:08:43Z",
+      "albumIds": [
+        "default-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/8a/8a18cde34df8862e26746844beaf367196ccacfe408cd48be046a7b0bd003dce.jpg",
+          "sha256": "8a18cde34df8862e26746844beaf367196ccacfe408cd48be046a7b0bd003dce",
+          "mediaType": "image/jpeg",
+          "width": 2906,
+          "height": 1852
+        }
+      }
+    }
+  ]
+}
