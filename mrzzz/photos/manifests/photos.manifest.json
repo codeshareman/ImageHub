@@ -13,8 +13,8 @@
       "title": "Homepage Featured Photos",
       "description": "Selected public photos for the MRZZZ homepage featured gallery.",
       "tags": [
-        "homepage",
-        "featured"
+        "featured",
+        "homepage"
       ],
       "createdAt": "2026-08-08T00:00:00Z",
       "effectiveFrom": "2026-08-08T00:00:00Z",
@@ -28,83 +28,231 @@
   },
   "albums": [
     {
-      "id": "default-album",
-      "title": "Default Album",
-      "summary": "Initial gallery migrated from ImageHub photography assets.",
+      "id": "curated-album",
+      "title": "Curated Album",
+      "summary": "Distinct public album photos; excludes homepage featured slots.",
       "order": 10,
-      "coverPhotoId": "photo-001"
+      "coverPhotoId": "photo-005"
     }
   ],
   "photos": [
     {
       "id": "photo-001",
-      "title": "Morning Landscape",
-      "caption": "Migrated from the existing ImageHub photography collection.",
-      "takenAt": "2026-02-21T09:34:03Z",
-      "albumIds": [
-        "default-album"
-      ],
+      "assetKind": "photo",
+      "title": "山脊的最后一束光",
+      "caption": "傍晚雪山与树林",
+      "takenAt": "2026-07-06T09:18:00Z",
+      "albumIds": [],
       "variants": {
         "card": {
-          "assetPath": "mrzzz/photos/objects/sha256/bd/bdf4856cb8c3868aad01653656dbc26ea4b8ee0839857f37acb5c29ced3dddfc.jpg",
-          "sha256": "bdf4856cb8c3868aad01653656dbc26ea4b8ee0839857f37acb5c29ced3dddfc",
+          "assetPath": "mrzzz/photos/objects/sha256/aa/aa4790d7c3dd34b24ca65a383ebf6caa2e017a6d40eb6595131e78bf6855a770.jpg",
+          "sha256": "aa4790d7c3dd34b24ca65a383ebf6caa2e017a6d40eb6595131e78bf6855a770",
           "mediaType": "image/jpeg",
-          "width": 842,
-          "height": 1722
+          "width": 720,
+          "height": 720
         }
       }
     },
     {
       "id": "photo-002",
-      "title": "Quiet Ridge",
-      "caption": "Migrated from the existing ImageHub photography collection.",
-      "takenAt": "2026-02-21T09:30:12Z",
-      "albumIds": [
-        "default-album"
-      ],
+      "assetKind": "photo",
+      "title": "浪抵达岸边",
+      "caption": "海浪拍打礁石",
+      "takenAt": "2026-07-12T17:42:00Z",
+      "albumIds": [],
       "variants": {
         "card": {
-          "assetPath": "mrzzz/photos/objects/sha256/c9/c9e3439973b989ed1987e55eb12c46690cd54b0466ed344e78eea84743dd1151.jpg",
-          "sha256": "c9e3439973b989ed1987e55eb12c46690cd54b0466ed344e78eea84743dd1151",
+          "assetPath": "mrzzz/photos/objects/sha256/37/37c5adfdaec413e0ff52977d3cc2b63ab0a382fdcca5673fb876a1b9c80778b0.jpg",
+          "sha256": "37c5adfdaec413e0ff52977d3cc2b63ab0a382fdcca5673fb876a1b9c80778b0",
           "mediaType": "image/jpeg",
-          "width": 760,
-          "height": 1322
+          "width": 720,
+          "height": 720
         }
       }
     },
     {
       "id": "photo-003",
-      "title": "Low Clouds",
-      "caption": "Migrated from the existing ImageHub photography collection.",
-      "takenAt": "2026-02-21T09:30:54Z",
-      "albumIds": [
-        "default-album"
-      ],
+      "assetKind": "photo",
+      "title": "途中短暂停靠",
+      "caption": "停在路边的复古面包车",
+      "takenAt": "2026-07-19T14:25:00Z",
+      "albumIds": [],
       "variants": {
         "card": {
-          "assetPath": "mrzzz/photos/objects/sha256/48/483ad57140ab36d26add7e3892f875c4cba378f91f705e902aa1781affc18844.jpg",
-          "sha256": "483ad57140ab36d26add7e3892f875c4cba378f91f705e902aa1781affc18844",
+          "assetPath": "mrzzz/photos/objects/sha256/f9/f9d0804ed64ffb2935adc92ec8b27c1472e9586d43c6931ffb72948025046385.jpg",
+          "sha256": "f9d0804ed64ffb2935adc92ec8b27c1472e9586d43c6931ffb72948025046385",
           "mediaType": "image/jpeg",
-          "width": 718,
-          "height": 324
+          "width": 720,
+          "height": 720
         }
       }
     },
     {
       "id": "photo-004",
-      "title": "Wide Valley",
-      "caption": "Migrated from the existing ImageHub photography collection.",
-      "takenAt": "2026-02-19T16:08:43Z",
+      "assetKind": "photo",
+      "title": "窗边的片刻",
+      "caption": "窗边人物肖像",
+      "takenAt": "2026-07-27T10:08:00Z",
+      "albumIds": [],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/c3/c32c762efcc87fa2b89783938aeb415f1fe44a6432bf0202ce5d8d35cddb59a0.jpg",
+          "sha256": "c32c762efcc87fa2b89783938aeb415f1fe44a6432bf0202ce5d8d35cddb59a0",
+          "mediaType": "image/jpeg",
+          "width": 720,
+          "height": 720
+        }
+      }
+    },
+    {
+      "id": "photo-005",
+      "assetKind": "photo",
+      "title": "抬头看见云",
+      "caption": "蓝天中的羽状云",
+      "takenAt": "2026-08-03T11:36:00Z",
       "albumIds": [
-        "default-album"
+        "curated-album"
       ],
       "variants": {
         "card": {
-          "assetPath": "mrzzz/photos/objects/sha256/8a/8a18cde34df8862e26746844beaf367196ccacfe408cd48be046a7b0bd003dce.jpg",
-          "sha256": "8a18cde34df8862e26746844beaf367196ccacfe408cd48be046a7b0bd003dce",
+          "assetPath": "mrzzz/photos/objects/sha256/ff/ff09ffa85dbfa22cfda0fc1a64905f96bea65dc59f485c5d242c421f4773a759.jpg",
+          "sha256": "ff09ffa85dbfa22cfda0fc1a64905f96bea65dc59f485c5d242c421f4773a759",
           "mediaType": "image/jpeg",
-          "width": 2906,
-          "height": 1852
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-006",
+      "assetKind": "photo",
+      "title": "秩序与零件",
+      "caption": "整齐拆解陈列的机械零件",
+      "takenAt": "2026-08-08T15:04:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/93/93b6fd3807e492d4fb7cfb93f63c789d6caa1324bf71f4a8224e9e42786a27b9.jpg",
+          "sha256": "93b6fd3807e492d4fb7cfb93f63c789d6caa1324bf71f4a8224e9e42786a27b9",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-007",
+      "assetKind": "photo",
+      "title": "湖边晚风",
+      "caption": "湖畔芦苇与远山",
+      "takenAt": "2026-08-13T18:22:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/be/be96275ee80270782d355e45bda90ae5803050da4a2a3d726ad6a78b0dec7864.jpg",
+          "sha256": "be96275ee80270782d355e45bda90ae5803050da4a2a3d726ad6a78b0dec7864",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-008",
+      "assetKind": "photo",
+      "title": "沿运河散步",
+      "caption": "暮色中的运河与街道",
+      "takenAt": "2026-08-17T19:10:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/c7/c74b1931039d2d3466515c65558f22a2faf64daa75bee69530c645d8e6530f93.jpg",
+          "sha256": "c74b1931039d2d3466515c65558f22a2faf64daa75bee69530c645d8e6530f93",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-009",
+      "assetKind": "photo",
+      "title": "草叶之间",
+      "caption": "黑白照片中的草叶特写",
+      "takenAt": "2026-08-21T08:44:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/12/12fcab702f96ddc188aba8e07a79ed8cef98a720aab99d75731454d0d4f85557.jpg",
+          "sha256": "12fcab702f96ddc188aba8e07a79ed8cef98a720aab99d75731454d0d4f85557",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-010",
+      "assetKind": "photo",
+      "title": "清晨白霜",
+      "caption": "覆着白霜的植物",
+      "takenAt": "2026-08-24T07:31:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/cc/cc1287c1512ace369b430f468901aab577c7af561329a029d78b1c55207a23b4.jpg",
+          "sha256": "cc1287c1512ace369b430f468901aab577c7af561329a029d78b1c55207a23b4",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-011",
+      "assetKind": "photo",
+      "title": "花丛暮色",
+      "caption": "暮色花丛中的人物",
+      "takenAt": "2026-08-27T18:56:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/00/000e76f091cb5a1c7619667e92bf4f3c14b8de77dd870892a835b00b58e3af4e.jpg",
+          "sha256": "000e76f091cb5a1c7619667e92bf4f3c14b8de77dd870892a835b00b58e3af4e",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
+        }
+      }
+    },
+    {
+      "id": "photo-012",
+      "assetKind": "photo",
+      "title": "工作台一角",
+      "caption": "桌面上的笔记本电脑与水杯",
+      "takenAt": "2026-08-30T13:12:00Z",
+      "albumIds": [
+        "curated-album"
+      ],
+      "variants": {
+        "card": {
+          "assetPath": "mrzzz/photos/objects/sha256/a3/a349e660cb4d6d781cc896b5f454dd81e841a615d746c9b6d079b3cf6307693d.jpg",
+          "sha256": "a349e660cb4d6d781cc896b5f454dd81e841a615d746c9b6d079b3cf6307693d",
+          "mediaType": "image/jpeg",
+          "width": 800,
+          "height": 600
         }
       }
     }

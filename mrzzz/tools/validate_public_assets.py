@@ -24,8 +24,8 @@ ASSET_PROVIDER_REQUIRED_KEYS = {
 }
 ALBUM_REQUIRED_KEYS = {"id", "title", "order", "coverPhotoId"}
 ALBUM_OPTIONAL_KEYS = {"summary"}
-PHOTO_REQUIRED_KEYS = {"id", "title", "takenAt", "albumIds", "variants"}
-PHOTO_OPTIONAL_KEYS = {"caption"}
+PHOTO_REQUIRED_KEYS = {"id", "assetKind", "title", "albumIds", "variants"}
+PHOTO_OPTIONAL_KEYS = {"caption", "takenAt", "capturedAt"}
 VARIANT_REQUIRED_KEYS = {"assetPath", "sha256", "mediaType", "width", "height"}
 FEATURED_COLLECTION_REQUIRED_KEYS = {"title", "createdAt", "effectiveFrom", "photoIds"}
 FEATURED_COLLECTION_OPTIONAL_KEYS = {"description", "tags"}
@@ -349,8 +349,21 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
                 errors.append(f"{photo_label}.title must be a non-empty string")
             if "caption" in photo and not isinstance(photo.get("caption"), str):
                 errors.append(f"{photo_label}.caption must be a string")
-            if not is_rfc3339_datetime(photo.get("takenAt")):
-                errors.append(f"{photo_label}.takenAt must be an RFC3339 date-time string")
+            asset_kind = photo.get("assetKind")
+            if asset_kind not in {"photo", "screenshot"}:
+                errors.append(f"{photo_label}.assetKind must equal photo or screenshot")
+            has_taken_at = "takenAt" in photo
+            has_captured_at = "capturedAt" in photo
+            if asset_kind == "photo":
+                if not is_rfc3339_datetime(photo.get("takenAt")):
+                    errors.append(f"{photo_label}.takenAt must be an RFC3339 date-time string for photo assets")
+                if has_captured_at:
+                    errors.append(f"{photo_label}.capturedAt is only valid for screenshot assets")
+            if asset_kind == "screenshot":
+                if not is_rfc3339_datetime(photo.get("capturedAt")):
+                    errors.append(f"{photo_label}.capturedAt must be an RFC3339 date-time string for screenshot assets")
+                if has_taken_at:
+                    errors.append(f"{photo_label}.takenAt is only valid for photo assets")
             album_ids = photo.get("albumIds")
             if not isinstance(album_ids, list):
                 errors.append(f"{photo_label}.albumIds must be an array")

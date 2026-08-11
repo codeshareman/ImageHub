@@ -195,8 +195,8 @@
         "additionalProperties": false,
         "required": [
           "id",
+          "assetKind",
           "title",
-          "takenAt",
           "albumIds",
           "variants"
         ],
@@ -262,8 +262,65 @@
                 }
               }
             }
+          },
+          "assetKind": {
+            "type": "string",
+            "enum": [
+              "photo",
+              "screenshot"
+            ]
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "assetKind": {
+                  "const": "photo"
+                }
+              },
+              "required": [
+                "assetKind"
+              ]
+            },
+            "then": {
+              "required": [
+                "takenAt"
+              ],
+              "not": {
+                "required": [
+                  "capturedAt"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "assetKind": {
+                  "const": "screenshot"
+                }
+              },
+              "required": [
+                "assetKind"
+              ]
+            },
+            "then": {
+              "required": [
+                "capturedAt"
+              ],
+              "not": {
+                "required": [
+                  "takenAt"
+                ]
+              }
+            }
+          }
+        ]
       }
     }
   }
