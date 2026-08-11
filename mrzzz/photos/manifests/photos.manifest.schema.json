@@ -27,20 +27,131 @@
         "ingressPathPrefix"
       ],
       "properties": {
-        "type": { "const": "github-repo" },
-        "repo": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
-        "branch": { "type": "string", "minLength": 1 },
-        "manifestPath": { "type": "string", "const": "mrzzz/photos/manifests/photos.manifest.json" },
-        "assetPathPrefix": { "type": "string", "const": "mrzzz/photos/objects/" },
-        "ingressPathPrefix": { "type": "string", "const": "mrzzz/photos/inbox/" }
+        "type": {
+          "const": "github-repo"
+        },
+        "repo": {
+          "type": "string",
+          "pattern": "^[^/]+/[^/]+$"
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifestPath": {
+          "type": "string",
+          "const": "mrzzz/photos/manifests/photos.manifest.json"
+        },
+        "assetPathPrefix": {
+          "type": "string",
+          "const": "mrzzz/photos/objects/"
+        },
+        "ingressPathPrefix": {
+          "type": "string",
+          "const": "mrzzz/photos/inbox/"
+        }
       }
     },
     "featuredCollections": {
       "type": "object",
+      "required": [
+        "homepage-featured"
+      ],
       "additionalProperties": {
-        "type": "array",
-        "items": { "type": "string", "minLength": 1 },
-        "uniqueItems": true
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "createdAt",
+          "effectiveFrom",
+          "photoIds"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "tags": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "photoIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "properties": {
+        "homepage-featured": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "createdAt",
+            "effectiveFrom",
+            "photoIds"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "tags": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "effectiveFrom": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "photoIds": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        }
       }
     },
     "albums": {
@@ -48,13 +159,32 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "order", "coverPhotoId"],
+        "required": [
+          "id",
+          "title",
+          "order",
+          "coverPhotoId"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "title": { "type": "string", "minLength": 1 },
-          "summary": { "type": "string" },
-          "order": { "type": "integer", "minimum": 0 },
-          "coverPhotoId": { "type": "string", "minLength": 1 }
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "coverPhotoId": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
@@ -63,15 +193,35 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "takenAt", "albumIds", "variants"],
+        "required": [
+          "id",
+          "title",
+          "takenAt",
+          "albumIds",
+          "variants"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "title": { "type": "string", "minLength": 1 },
-          "caption": { "type": "string" },
-          "takenAt": { "type": "string", "format": "date-time" },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "caption": {
+            "type": "string"
+          },
+          "takenAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "albumIds": {
             "type": "array",
-            "items": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
           },
           "variants": {
@@ -80,19 +230,36 @@
             "additionalProperties": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["assetPath", "sha256", "mediaType", "width", "height"],
+              "required": [
+                "assetPath",
+                "sha256",
+                "mediaType",
+                "width",
+                "height"
+              ],
               "properties": {
                 "assetPath": {
                   "type": "string",
                   "pattern": "^mrzzz/photos/objects/sha256/[0-9a-f]{2}/[0-9a-f]{64}\\.jpe?g$"
                 },
-                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
                 "mediaType": {
                   "type": "string",
-                  "enum": ["image/jpeg"]
+                  "enum": [
+                    "image/jpeg"
+                  ]
                 },
-                "width": { "type": "integer", "minimum": 1 },
-                "height": { "type": "integer", "minimum": 1 }
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
               }
             }
           }

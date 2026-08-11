@@ -1,0 +1,12 @@
+ImageHub repository notice
+
+The root LICENSE file applies to repository code, scripts, schemas, and manifest scaffolding unless a file states otherwise.
+
+Photo and image assets are not granted under the root MIT license unless an asset-specific notice explicitly says so.
+
+All assets under these paths are all rights reserved by default:
+- images/
+- mrzzz/photos/objects/
+- mrzzz/photos/inbox/
+
+MRZZZ public photo publishing uses only the dedicated mrzzz/photos/ tree. Legacy assets under images/ are not part of the MRZZZ publish surface unless they are processed into mrzzz/photos/objects/ and listed by mrzzz/photos/manifests/photos.manifest.json.

@@ -9,12 +9,22 @@
     "ingressPathPrefix": "mrzzz/photos/inbox/"
   },
   "featuredCollections": {
-    "home-quad": [
-      "photo-001",
-      "photo-002",
-      "photo-003",
-      "photo-004"
-    ]
+    "homepage-featured": {
+      "title": "Homepage Featured Photos",
+      "description": "Selected public photos for the MRZZZ homepage featured gallery.",
+      "tags": [
+        "homepage",
+        "featured"
+      ],
+      "createdAt": "2026-08-08T00:00:00Z",
+      "effectiveFrom": "2026-08-08T00:00:00Z",
+      "photoIds": [
+        "photo-001",
+        "photo-002",
+        "photo-003",
+        "photo-004"
+      ]
+    }
   },
   "albums": [
     {

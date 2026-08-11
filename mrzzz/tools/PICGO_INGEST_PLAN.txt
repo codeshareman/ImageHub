@@ -1,0 +1,367 @@
+PicGo to MRZZZ photo ingest plan
+
+Background
+
+ImageHub currently has two different image areas:
+
+- images/: legacy image library, organized manually by topic.
+- mrzzz/photos/: MRZZZ public photo publishing tree.
+
+Repository rules already define the publishing boundary:
+
+- mrzzz/photos/inbox/ is only the PicGo upload landing zone; files there are not publishable.
+- mrzzz/photos/objects/sha256/ is the publishable object store.
+- mrzzz/photos/manifests/photos.manifest.json is the public metadata source of truth.
+- images/ is not part of the MRZZZ publishing surface unless an asset is processed into mrzzz/photos/objects/ and listed in the manifest.
+
+This plan establishes a new MRZZZ publishing pipeline. It does not reorganize the legacy images/ tree.
+
+Repository boundary
+
+The MRZZZ photo publish tree remains asset-only. No ingest implementation, sync job, backend adapter, or publishing logic is added under mrzzz/photos/. Repo-local helper code belongs under mrzzz/tools/, matching the existing validator location. The helper may write assets and manifest entries into mrzzz/photos/, but it is not part of the mrzzz/photos/ publish source tree.
+
+Goal
+
+Create a low-maintenance, verifiable, stable-link workflow:
+
+PicGo upload
+  -> mrzzz/photos/inbox/
+  -> ingest script
+  -> mrzzz/photos/objects/sha256/<sha-prefix>/<sha256>.jpg
+  -> mrzzz/photos/manifests/photos.manifest.json
+  -> existing validator
+
+
+Current document effect
+
+This file is a plan only. It changes no runtime behavior until the ingest script and related validation controls are implemented. Current effect: the intended manifest examples and implementation requirements are aligned with the existing schema and validator.
+
+Non-goals
+
+- Do not turn images/ into the MRZZZ publishing source.
+- Do not publish directly from mrzzz/photos/inbox/.
+- Do not use physical directories as the business taxonomy.
+- Do not rely on periodic manual folder cleanup.
+- Do not start with full GitHub Action automation; first make local ingest reliable.
+
+Design principles
+
+1. Fixed ingress: PicGo uploads only to mrzzz/photos/inbox/.
+2. Stable storage: published objects use content-addressed sha256 paths.
+3. Flexible classification: albums, titles, covers, and ordering live in the manifest, not in file paths.
+4. Explicit publishing: only manifest-referenced objects are public photos.
+5. Manual first, automation later: implement local ingest before GitHub Action automation.
+
+PicGo configuration
+
+GitHub image host settings:
+
+repo: codeshareman/ImageHub
+branch: main
+path: mrzzz/photos/inbox/
+
+The URL PicGo copies after upload points at the inbox object. Treat it as temporary ingress, not a long-term MRZZZ public URL.
+
+Phase 1 implementation: risk-closed local ingest
+
+Add files:
+
+mrzzz/tools/ingest_photo.py
+mrzzz/tools/requirements-ingest.txt
+
+Dependency policy
+
+- The existing validator remains stdlib-only.
+- The ingest script uses Pillow for decoding, orientation handling, RGB conversion, and JPEG re-encoding.
+- requirements-ingest.txt pins the supported Pillow dependency range.
+- If Pillow is missing or outside the supported range, ingest fails before reading or writing manifest/object files.
+
+Single-file import into an existing album:
+
+python3 -m pip install -r mrzzz/tools/requirements-ingest.txt
+python3 mrzzz/tools/ingest_photo.py \
+  --file mrzzz/photos/inbox/example.png \
+  --album existing-album-id \
+  --title "Outdoor landscape" \
+  --taken-at "2026-02-21T09:34:03+08:00"
+
+First photo for a new album, created explicitly and atomically:
+
+python3 mrzzz/tools/ingest_photo.py \
+  --file mrzzz/photos/inbox/example.png \
+  --album photography \
+  --create-album-title "Photography" \
+  --album-order 0 \
+  --title "Outdoor landscape" \
+  --taken-at "2026-02-21T09:34:03+08:00"
+
+Phase 1 does not support batch publishing. Batch import moves to Phase 2 and requires sidecar metadata for every image.
+
+Arguments
+
+Required:
+
+- --file <path>
+- --album <album-id>
+- --title <title>
+
+Conditionally required:
+
+- --create-album-title <title> and --album-order <non-negative-int> are required only when --album does not already exist.
+- --background <#rrggbb> is required when the source image has transparency; ingest must not silently flatten transparent pixels.
+
+Optional:
+
+- --taken-at <RFC3339 datetime>; if omitted, derive from file mtime with timezone.
+- --caption <text>
+- --photo-id <id>; if omitted, generate a lowercase slug from title and timestamp.
+- --dry-run; print planned object path and manifest diff without writing.
+
+Removed from Phase 1:
+
+- --delete-source is not implemented in Phase 1. Source deletion is a data-loss risk and should be a separate cleanup action after the publish path is proven.
+- --inbox batch mode is not implemented in Phase 1. Batch mode without sidecar metadata is a wrong-publication risk.
+
+Input validation and fail-closed rules
+
+1. The source file must resolve under mrzzz/photos/inbox/ after symlink and path normalization.
+2. The source file must be a regular file, not a directory, symlink escape, or sidecar JSON.
+3. Supported source formats are decoded by Pillow; unsupported formats fail before writes.
+4. Animated or multi-frame images fail in Phase 1.
+5. Images above the configured byte-size or pixel-count limit fail before decode-heavy processing.
+6. EXIF orientation is applied before metadata is stripped.
+7. Transparent images fail unless --background is provided.
+8. Output is normalized to RGB JPEG.
+9. The script must not pass EXIF, ICC, XMP, IPTC, or other source metadata into the saved derivative.
+10. The saved derivative must pass the existing APP1/APP13 validator checks.
+
+Script responsibilities
+
+1. Preflight dependencies and input path before any writes.
+2. Load the existing manifest and validate its current shape.
+3. Validate the album state:
+   - If --album exists, import into that album.
+   - If --album is missing, fail unless --create-album-title and --album-order are present.
+   - When creating an album, create the album and first photo in the same manifest update, with coverPhotoId set to the new photo id.
+4. Decode the image, apply EXIF orientation, normalize pixels, and save a metadata-free JPEG derivative to a temporary file.
+5. Inspect the derivative width and height.
+6. Compute sha256 of the derivative.
+7. Derive the object path:
+
+   mrzzz/photos/objects/sha256/<first-two-sha-chars>/<sha>.jpg
+
+8. Enforce immutability:
+   - If the object path is absent, create it once.
+   - If the object path exists with identical bytes and is not referenced, reuse it.
+   - If the object path exists with different bytes, fail.
+   - If the same sha256 is already referenced by an existing photo, fail and print the existing photo id instead of creating a duplicate photo entry.
+9. Add a new photo entry with a variants object keyed by original.
+10. Validate the candidate manifest in memory before writing.
+11. Write object and manifest transactionally.
+12. Run python3 mrzzz/tools/validate_public_assets.py --repo-root . automatically after writes.
+13. If validation fails after writes, restore the original manifest and remove any newly written object file.
+14. Print a final status that includes the photo id, manifest path, and object path, but does not present the PicGo inbox URL as a final public URL.
+
+Manifest write rules
+
+Suggested photo entry shape:
+
+{
+  "id": "outdoor-landscape-20260221093403",
+  "title": "Outdoor landscape",
+  "takenAt": "2026-02-21T09:34:03+08:00",
+  "albumIds": ["photography"],
+  "variants": {
+    "original": {
+      "assetPath": "mrzzz/photos/objects/sha256/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpg",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mediaType": "image/jpeg",
+      "width": 1600,
+      "height": 1200
+    }
+  }
+}
+
+Rules:
+
+- variants is a non-empty object, not an array.
+- The first Phase 1 variant key is original.
+- sha256 is exactly 64 lowercase hex characters.
+- assetPath embeds the same sha256 in both directory prefix and basename.
+- photo.id uses only lowercase letters, digits, and hyphens.
+- If photo.id already exists, fail; do not overwrite.
+- JSON output is deterministic: two-space indentation, stable key order matching the existing manifest shape, and a trailing newline.
+
+Phase 2: sidecar metadata and batch ingest
+
+Support a JSON file next to each inbox image:
+
+mrzzz/photos/inbox/example.jpg
+mrzzz/photos/inbox/example.json
+
+Sidecar schema:
+
+{
+  "title": "Outdoor landscape",
+  "albumIds": ["photography"],
+  "takenAt": "2026-02-21T09:34:03+08:00",
+  "caption": "Optional caption"
+}
+
+Rules:
+
+- Unknown sidecar keys fail validation.
+- title, albumIds, and takenAt are required for batch publishing.
+- albumIds must be non-empty and duplicate-free.
+- If any batch item is missing sidecar metadata, the whole batch fails before writes.
+- If any sidecar references a missing album, the whole batch fails unless explicit album-creation metadata is present.
+- Batch mode is all-or-nothing: no partial manifest/object writes.
+
+Phase 3: GitHub Action
+
+After local ingest and sidecar mode are stable:
+
+1. Run only on PRs or manual workflow dispatch for the first automation version.
+2. Detect new images in mrzzz/photos/inbox/.
+3. Require sidecar metadata for every image considered for publishing.
+4. Run ingest in dry-run or check mode first.
+5. Run mrzzz/tools/validate_public_assets.py.
+6. Fail the check with a clear list of missing metadata or validation errors.
+7. Do not push generated commits directly to main in the first automation version.
+8. Use least-privilege workflow permissions.
+
+Acceptance criteria
+
+Phase 1 is complete when:
+
+- PicGo can be configured to upload to mrzzz/photos/inbox/.
+- The plan file remains documentation-only until ingest_photo.py is implemented.
+- ingest_photo.py --file imports one inbox image into an existing album.
+- ingest_photo.py --file can explicitly create the first album and first photo atomically when the manifest has no albums.
+- The imported object path matches the existing validator rules.
+- photos.manifest.json is updated with a valid photo entry whose variants field is an object.
+- python3 mrzzz/tools/validate_public_assets.py --repo-root . succeeds automatically after import.
+- The script rolls back manifest/object writes on validation failure.
+- inbox files are not treated as published photos.
+- images/ remains outside the MRZZZ publishing flow.
+- Published object files are never overwritten with different content.
+- The script does not delete source inbox files in Phase 1.
+- Duplicate content already referenced by an existing photo does not create a duplicate photo entry.
+
+Verification steps
+
+1. Put a test image under mrzzz/photos/inbox/.
+2. For the current empty manifest, run the explicit first-album path:
+
+   python3 mrzzz/tools/ingest_photo.py \
+     --file mrzzz/photos/inbox/test.jpg \
+     --album photography \
+     --create-album-title "Photography" \
+     --album-order 0 \
+     --title "Test photo" \
+     --taken-at "2026-02-21T09:34:03+08:00"
+
+3. Run, or confirm the script already ran:
+
+   python3 mrzzz/tools/validate_public_assets.py --repo-root .
+
+4. Confirm:
+
+   - Object file exists under mrzzz/photos/objects/sha256/<prefix>/<sha>.jpg.
+   - Manifest has the new photo entry.
+   - Manifest has a new album only because explicit album-creation arguments were provided.
+   - The new album coverPhotoId equals the new photo id.
+   - Validator exits successfully.
+   - Source inbox file remains in place.
+
+Resolved risk controls
+
+Risk: The helper tool placement violates the mrzzz/photos/ asset-only boundary.
+Control: The plan file and future helper implementation live under mrzzz/tools/. The mrzzz/photos/ subtree remains limited to publish assets, manifests, schema, and existing descriptive files.
+
+
+Risk: This plan is mistaken for implemented behavior.
+Control: The plan states it is documentation-only until ingest_photo.py exists and passes verification.
+
+Risk: variants is written as an array and violates schema/validator.
+Control: The manifest example and acceptance criteria require variants as an object keyed by original.
+
+Risk: The current empty manifest cannot import the first photo if album creation is forbidden.
+Control: Missing albums fail by default, but explicit --create-album-title plus --album-order creates the album and first photo atomically.
+
+Risk: User treats the PicGo inbox URL as the final public URL.
+Control: The script prints object/manifest identifiers only and states final public URLs are produced later by build consumers from commit-pinned manifest data.
+
+Risk: Auto-created albums cause taxonomy drift.
+Control: Album creation requires explicit CLI arguments and is never inferred from filenames or paths.
+
+Risk: Private metadata leaks through photos.
+Control: Ingest re-encodes from normalized pixels, passes no source metadata to the derivative, and must pass the existing APP1/APP13 validator checks.
+
+Risk: EXIF orientation is lost when stripping metadata.
+Control: Ingest applies EXIF orientation before stripping metadata and saving the derivative.
+
+Risk: Transparent images are silently changed.
+Control: Transparent images fail unless --background is explicitly provided.
+
+Risk: Animated images publish an unintended frame.
+Control: Animated or multi-frame sources fail in Phase 1.
+
+Risk: Malicious or huge images exhaust memory or CPU.
+Control: Ingest enforces byte-size and pixel-count limits before decode-heavy processing.
+
+Risk: Duplicate imports create duplicate photo entries.
+Control: Duplicate photo.id fails, and duplicate sha256 already referenced by another photo fails with the existing photo id.
+
+Risk: Existing object paths are overwritten.
+Control: Object paths are content-addressed and immutable; existing different bytes fail.
+
+Risk: Manifest corruption or unreferenced object files remain after a failure.
+Control: Writes are transactional, validator failure rolls back manifest changes, and newly written objects are removed.
+
+Risk: Batch import publishes wrong metadata.
+Control: Phase 1 has no batch publish mode; Phase 2 batch requires strict sidecar metadata for every image and is all-or-nothing.
+
+Risk: GitHub Action automation publishes incorrect content.
+Control: First automation is PR/manual check-only, sidecar-required, least-privilege, and does not push generated commits to main.
+
+Decision record
+
+Decision:
+Use fixed inbox plus an explicit, fail-closed ingest script, content-addressed objects, and manifest-based classification.
+
+Drivers:
+- PicGo upload does not naturally collect publishing metadata.
+- Published URLs need stable paths.
+- One photo can belong to multiple albums.
+- Existing repository rules already define inbox, objects, manifest, and validator boundaries.
+- The current manifest has no albums, so the first publish needs an explicit atomic album-plus-photo path.
+
+Alternatives considered:
+
+1. Periodically reorganize directories.
+   Pro: simple to understand.
+   Con: moving paths can break links and conflicts with the manifest publishing model.
+
+2. Create multiple PicGo configurations for category directories.
+   Pro: fewer scripts.
+   Con: still forces classification at upload time and binds business taxonomy to paths.
+
+3. Fully automatic GitHub Action from day one.
+   Pro: high automation.
+   Con: without metadata it cannot reliably determine title, albums, or publication intent.
+
+Why chosen:
+This matches the current repository contract: inbox is ingress, objects/sha256 is publishable storage, and the manifest is the public publishing source. The updated plan also closes the empty-manifest bootstrap gap by requiring explicit atomic album creation for the first photo.
+
+Consequences:
+- Adds one ingest script and one ingest dependency file.
+- Keeps PicGo configuration simple.
+- Adds a manual import step before publishing.
+- Reduces link breakage, metadata leak, duplicate import, rollback, and first-album bootstrap risks.
+
+Follow-ups:
+- Implement ingest_photo.py and requirements-ingest.txt.
+- Add sidecar metadata support after single-file ingest passes verification.
+- Add GitHub Action check-only validation/import later.
+- Optionally add a separate ordinary-note PicGo path such as images/inbox/, isolated from the MRZZZ publishing flow.
